@@ -103,6 +103,20 @@
                                                            key-prefix
                                                            tables)))
 
+(defun cape-yasnippet--lsp ()
+  "Create a super capf to include snippets in LSP completion."
+  (setq-local completion-at-point-functions
+              (list (cape-super-capf
+                     #'lsp-completion-at-point
+                     #'cape-yasnippet))))
+
+(defun cape-yasnippet--eglot ()
+  "Create a super capf to include snippets in LSP completion."
+  (setq-local completion-at-point-functions
+              (list (cape-super-capf
+                     #'eglot-completion-at-point
+                     #'cape-yasnippet))))
+
 ;;;###autoload
 (defun cape-yasnippet (&optional interactive)
   "Complete with yasnippet at point.
