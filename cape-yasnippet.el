@@ -29,6 +29,7 @@
 (declare-function yas--template-expand-env "yasnippet")
 (declare-function yas--warning "yasnippet")
 (declare-function yas-minor-mode "yasnippet")
+(declare-function yas-expand "yasnippet")
 (declare-function yas--require-template-specific-condition-p "yasnippet")
 (declare-function yas--template-can-expand-p "yasnippet")
 (declare-function yas--template-condition "yasnippet")
@@ -91,31 +92,19 @@
 (defvar cape-yasnippet--properties
   (list :annotation-function (lambda (_) " Yasnippet")
         :company-kind (lambda (_) 'text)
+        :exit-function (lambda (_ status) (if (string= "finished" status)
+                                              (yas-expand)))
         :exclusive 'no)
   "Completion extra properties for `cape-yasnippet'.")
 
 (defun cape-yasnippet--list (prefix)
   "Find all snippets for major-mode matching PREFIX."
-(cl-loop with tables = (yas--get-snippet-tables)
+  (cl-loop with tables = (yas--get-snippet-tables)
            for key-prefix in (cape-yasnippet--key-prefixes)
            when (>= (length key-prefix) (length prefix))
            thereis (cape-yasnippet--completions-for-prefix prefix
                                                            key-prefix
                                                            tables)))
-
-(defun cape-yasnippet--lsp ()
-  "Create a super capf to include snippets in LSP completion."
-  (setq-local completion-at-point-functions
-              (list (cape-super-capf
-                     #'lsp-completion-at-point
-                     #'cape-yasnippet))))
-
-(defun cape-yasnippet--eglot ()
-  "Create a super capf to include snippets in LSP completion."
-  (setq-local completion-at-point-functions
-              (list (cape-super-capf
-                     #'eglot-completion-at-point
-                     #'cape-yasnippet))))
 
 ;;;###autoload
 (defun cape-yasnippet (&optional interactive)
@@ -128,12 +117,12 @@ If INTERACTIVE is nil the function acts like a Capf."
       (let ((beg (match-beginning 0))
             (end (match-end 0)))
         `(,beg ,end
-               ,(cape--table-with-properties
-                 (cape--cached-table beg end
-                                     #'cape-yasnippet--list
-                                     'prefix)
-                 :category 'cape-yasnippet)
-               ,@cape-yasnippet--properties)))))
+          ,(cape--table-with-properties
+            (cape--cached-table beg end
+                                #'cape-yasnippet--list
+                                'prefix)
+            :category 'cape-yasnippet)
+          ,@cape-yasnippet--properties)))))
 
 (provide 'cape-yasnippet)
 ;;; cape-yasnippet.el ends here
