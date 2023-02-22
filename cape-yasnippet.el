@@ -41,7 +41,7 @@
 
 (defvar cape-yasnippet--properties
   (list :annotation-function (lambda (_) " Yasnippet")
-        :company-kind (lambda (_) 'text)
+        :company-kind (lambda (_) 'snippet)
         :exit-function (lambda (cand status)
                          (when (string= "finished" status)
                            (when-let ((snippet (cape-yasnippet--lookup-snippet cand)))
