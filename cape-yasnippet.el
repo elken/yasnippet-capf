@@ -14,7 +14,7 @@
 ;;
 ;;; Commentary:
 ;;
-;; Yasnippet Completion at Point Extenstion to lookup snippets by name
+;; Yasnippet Completion at Point Extension to lookup snippets by name
 ;;
 ;; Simply add to the list of existing `completion-at-point-functions' thus:
 ;;    (add-to-list 'completion-at-point-functions #'cape-yasnippet)
