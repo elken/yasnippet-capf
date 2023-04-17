@@ -153,7 +153,7 @@ If INTERACTIVE is nil the function acts like a Capf."
           ,(cape--table-with-properties
             (cape--cached-table beg end
                                 #'cape-yasnippet-candidates
-                                'prefix)
+                                #'string-prefix-p)
             :category 'cape-yasnippet)
           ,@cape-yasnippet--properties)))))
 
