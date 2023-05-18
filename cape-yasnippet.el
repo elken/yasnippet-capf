@@ -40,7 +40,7 @@
           (const :tag "Name" name)))
 
 (defvar cape-yasnippet--properties
-  (list :annotation-function (lambda (_) " Yasnippet")
+  (list :annotation-function #'cape--yasnippet-annotation
         :company-kind (lambda (_) 'snippet)
         :exit-function (lambda (cand status)
                          (when (string= "finished" status)
@@ -49,6 +49,11 @@
                              (yas-expand-snippet snippet))))
         :exclusive 'no)
   "Completion extra properties for `cape-yasnippet'.")
+
+(defun cape--yasnippet-annotation (arg)
+  "Get the :name item as ARG for annotations."
+  (lambda (name))
+  (get-text-property 0 'yas-annotation arg))
 
 (defun cape-yasnippet--lookup-snippet (name)
   "Get the snippet called NAME in MODE's tables."
