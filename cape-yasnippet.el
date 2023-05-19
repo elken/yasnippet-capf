@@ -40,7 +40,7 @@
           (const :tag "Name" name)))
 
 (defvar cape-yasnippet--properties
-  (list :annotation-function (lambda (_) " Yasnippet")
+  (list :annotation-function (lambda (snippet) (get-text-property 0 'yas-annotation snippet))
         :company-kind (lambda (_) 'snippet)
         :exit-function (lambda (cand status)
                          (when (string= "finished" status)
