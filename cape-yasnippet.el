@@ -139,6 +139,11 @@
                                            (string-prefix-p prefix cand))))))
     (_ (error "Invalid value for cape-yasnippet-lookup-by: %s" cape-yasnippet-lookup-by))))
 
+(defun foo (&optional prefix)
+  "See if this works"
+  (list #'cape-yasnippet-candidates
+        (cape-yasnippet-candidates prefix)))
+
 ;;;###autoload
 (defun cape-yasnippet (&optional interactive)
   "Complete with yasnippet at point.
@@ -150,12 +155,10 @@ If INTERACTIVE is nil the function acts like a Capf."
       (let ((beg (match-beginning 0))
             (end (match-end 0)))
         `(,beg ,end
-          ,(cape--table-with-properties
-            (cape--cached-table beg end
-                                #'cape-yasnippet-candidates
-                                #'string-prefix-p)
-            :category 'cape-yasnippet)
-          ,@cape-yasnippet--properties)))))
+               ,(cape--table-with-properties
+                 (cape--cached-table beg end #'foo)
+                 :category 'cape-yasnippet)
+               ,@cape-yasnippet--properties)))))
 
 (provide 'cape-yasnippet)
 ;;; cape-yasnippet.el ends here
