@@ -139,6 +139,11 @@
                                            (string-prefix-p prefix cand))))))
     (_ (error "Invalid value for cape-yasnippet-lookup-by: %s" cape-yasnippet-lookup-by))))
 
+(defun cape-yasnippet--list (input)
+  "Use INPUT to compute and filter a new cached table."
+  (cons (apply-partially #'string-prefix-p input)
+        (cape-yasnippet-candidates input)))
+
 ;;;###autoload
 (defun cape-yasnippet (&optional interactive)
   "Complete with yasnippet at point.
@@ -151,9 +156,7 @@ If INTERACTIVE is nil the function acts like a Capf."
             (end (match-end 0)))
         `(,beg ,end
           ,(cape--table-with-properties
-            (cape--cached-table beg end
-                                #'cape-yasnippet-candidates
-                                #'string-prefix-p)
+            (cape--cached-table beg end #'cape-yasnippet--list)
             :category 'cape-yasnippet)
           ,@cape-yasnippet--properties)))))
 
