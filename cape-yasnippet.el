@@ -139,8 +139,9 @@
                                            (string-prefix-p prefix cand))))))
     (_ (error "Invalid value for cape-yasnippet-lookup-by: %s" cape-yasnippet-lookup-by))))
 
-(defun foo (&optional prefix)
-  "See if this works"
+(defun cape-yasnippet--cache-func (&optional prefix)
+  "Return a pair of a predicate function and the list of candidates.
+This is designed for use with cape--cached-table requires."
   (list #'cape-yasnippet-candidates
         (cape-yasnippet-candidates prefix)))
 
@@ -156,7 +157,7 @@ If INTERACTIVE is nil the function acts like a Capf."
             (end (match-end 0)))
         `(,beg ,end
                ,(cape--table-with-properties
-                 (cape--cached-table beg end #'foo)
+                 (cape--cached-table beg end #'cape-yasnippet--cache-func)
                  :category 'cape-yasnippet)
                ,@cape-yasnippet--properties)))))
 
