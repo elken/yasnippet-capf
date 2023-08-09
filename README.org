@@ -1,0 +1,32 @@
+#+title: cape-yasnippet
+
+A simple [[https://github.com/minad/cape][cape]] (Completion-At-Point Extension) for completing [[https://github.com/joaotavora/yasnippet][yasnippet]] snippets.
+
+* Install
+** Manual
+Download somewhere and add to your =load-path= and add =cape-yasnippet= to =completion-at-point-functions=.
+** TODO Doom
+Add the following lines to your relevant files
+
+=packages.el=
+#+begin_src emacs-lisp
+(package! cape-yasnippet
+  :recipe (:host github :repo "elken/cape-yasnippet"))
+#+end_src
+
+=config.el=
+#+begin_src emacs-lisp
+(use-package! cape-yasnippet
+  :after cape
+  :config
+  (add-to-list 'completion-at-point-functions #'cape-use-package))
+#+end_src
+
+* Configuration
+The following options are available to customise:
+** =cape-yasnippet-lookup-by=
+Which lookup method to use to query snippets. By default, this uses the key to query against but if preferred you can also set this to use the name of the snippet.
+
+#+begin_src emacs-lisp
+(setq cape-yasnippet-lookup-by 'name) ;; Prefer the name of the snippet instead
+#+end_src
