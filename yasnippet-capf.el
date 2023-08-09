@@ -1,4 +1,4 @@
-;;; cape-yasnippet.el --- Yasnippet Completion at Point Extension -*- lexical-binding: t; -*-
+;;; yasnippet-capf.el --- Yasnippet Completion At Point Function -*- lexical-binding: t; -*-
 ;;
 ;; Copyright (C) 2022 Ellis Kenyő
 ;;
@@ -7,8 +7,8 @@
 ;; Created: August 11, 2022
 ;; Modified: August 11, 2022
 ;; Version: 0.0.3
-;; Homepage: https://github.com/elken/cape-yasnippet
-;; Package-Requires: ((emacs "25.1"))
+;; Homepage: https://github.com/elken/yasnippet-capf
+;; Package-Requires: ((emacs "25.1") (yasnippet "0.14.0"))
 ;;
 ;; This file is not part of GNU Emacs.
 ;;
@@ -17,51 +17,51 @@
 ;; Yasnippet Completion at Point Extension to lookup snippets by name
 ;;
 ;; Simply add to the list of existing `completion-at-point-functions' thus:
-;;    (add-to-list 'completion-at-point-functions #'cape-yasnippet)
+;;    (add-to-list 'completion-at-point-functions #'yasnippet-capf)
 ;;
 ;; If you prefer to have the lookup done by name rather than key, set
-;; `cape-yasnippet-lookup-by'.
+;; `yasnippet-capf-lookup-by'.
 ;;
 ;;; Code:
 
-(require 'cape)
+(require 'thingatpt)
 (require 'yasnippet)
 (require 'cl-lib)
 (require 'subr-x)
 
-(defgroup cape-yasnippet nil
-  "Yasnippet CAPE."
-  :group 'cape)
+(defgroup yasnippet-capf nil
+  "Yasnippet CAPF."
+  :group 'completion)
 
-(defcustom cape-yasnippet-lookup-by 'key
+(defcustom yasnippet-capf-lookup-by 'key
   "The method in which to lookup candidates by."
   :type '(choice
           (const :tag "Key" key)
           (const :tag "Name" name)))
 
-(defvar cape-yasnippet--properties
+(defvar yasnippet-capf--properties
   (list :annotation-function (lambda (snippet) (get-text-property 0 'yas-annotation snippet))
         :company-kind (lambda (_) 'snippet)
         :exit-function (lambda (cand status)
                          (when (string= "finished" status)
-                           (when-let ((snippet (cape-yasnippet--lookup-snippet cand)))
+                           (when-let ((snippet (yasnippet-capf--lookup-snippet cand)))
                              (delete-char (* -1 (length cand)))
                              (yas-expand-snippet snippet))))
         :exclusive 'no)
-  "Completion extra properties for `cape-yasnippet'.")
+  "Completion extra properties for `yasnippet-capf'.")
 
-(defun cape-yasnippet--lookup-snippet (name)
+(defun yasnippet-capf--lookup-snippet (name)
   "Get the snippet called NAME in MODE's tables."
   (let ((yas-choose-tables-first nil)
         (yas-choose-keys-first nil))
     (cl-find name (yas--all-templates
                    (yas--get-snippet-tables major-mode))
-             :key (pcase cape-yasnippet-lookup-by
+             :key (pcase yasnippet-capf-lookup-by
                     ('key #'yas--template-key)
                     ('name #'yas--template-name))
              :test #'string=)))
 
-(defun cape-yasnippet--key-prefixes ()
+(defun yasnippet-capf--key-prefixes ()
   "Mostly copied from `yas--templates-for-key-at-point'."
   (defvar yas-key-syntaxes)
   (save-excursion
@@ -88,7 +88,7 @@
             (push prefix prefixes))))
       prefixes)))
 
-(defun cape-yasnippet--completions-for-prefix (prefix key-prefix tables)
+(defun yasnippet-capf--completions-for-prefix (prefix key-prefix tables)
   "Get a completion candidate for PREFIX with KEY-PREFIX in TABLES."
   (cl-mapcan
    (lambda (table)
@@ -105,12 +105,12 @@
                  (when (yas--template-can-expand-p
                         (yas--template-condition template) requirement)
                    (push
-                    (propertize (pcase cape-yasnippet-lookup-by
+                    (propertize (pcase yasnippet-capf-lookup-by
                                   ('key key)
                                   ('name name))
                                 'yas-annotation name
                                 'yas-template template
-                                'yas-prefix-offset (- (length (pcase cape-yasnippet-lookup-by
+                                'yas-prefix-offset (- (length (pcase yasnippet-capf-lookup-by
                                                                 ('key key)
                                                                 ('name name)))
                                                       (length prefix)))
@@ -120,14 +120,14 @@
        res))
    tables))
 
-(defun cape-yasnippet-candidates (&optional prefix)
+(defun yasnippet-capf-candidates (&optional prefix)
   "Return a list of candidate snippets filtered by PREFIX."
-  (pcase cape-yasnippet-lookup-by
+  (pcase yasnippet-capf-lookup-by
     ('key
      (cl-loop with tables = (yas--get-snippet-tables)
-              for key-prefix in (cape-yasnippet--key-prefixes)
+              for key-prefix in (yasnippet-capf--key-prefixes)
               when (>= (length key-prefix) (length prefix))
-              thereis (cape-yasnippet--completions-for-prefix prefix
+              thereis (yasnippet-capf--completions-for-prefix prefix
                                                               key-prefix
                                                               tables)))
     ('name
@@ -137,28 +137,33 @@
                   (cl-remove-if-not (lambda (cand)
                                       (and prefix
                                            (string-prefix-p prefix cand))))))
-    (_ (error "Invalid value for cape-yasnippet-lookup-by: %s" cape-yasnippet-lookup-by))))
+    (_ (error "Invalid value for yasnippet-capf-lookup-by: %s" yasnippet-capf-lookup-by))))
 
-(defun cape-yasnippet--list (input)
-  "Use INPUT to compute and filter a new cached table."
+(defun yasnippet-capf--list (input)
+  "Use INPUT to compute and filter a new completion table."
   (cons (apply-partially #'string-prefix-p input)
-        (cape-yasnippet-candidates input)))
+        (yasnippet-capf-candidates input)))
+
+(defun yasnippet-capf--completion-table ()
+  "Return a suitable function to create a completion table."
+  (lambda (str pred action)
+    (let ((snippets (yasnippet-capf--list str)))
+      (if (eq action 'metadata)
+          '(metadata (category . yasnippet-capf))
+        (complete-with-action action snippets str pred)))))
 
 ;;;###autoload
-(defun cape-yasnippet (&optional interactive)
+(defun yasnippet-capf (&optional interactive)
   "Complete with yasnippet at point.
 If INTERACTIVE is nil the function acts like a Capf."
   (interactive (list t))
   (if interactive
-      (cape-interactive #'cape-yasnippet)
+      (let ((completion-at-point-functions #'yasnippet-capf))
+        (or (completion-at-point) (user-error "yasnippet-capf: No completions")))
     (when (thing-at-point-looking-at "\\(?:\\sw\\|\\s_\\)+")
-      (let ((beg (match-beginning 0))
-            (end (match-end 0)))
-        `(,beg ,end
-          ,(cape--table-with-properties
-            (cape--cached-table beg end #'cape-yasnippet--list)
-            :category 'cape-yasnippet)
-          ,@cape-yasnippet--properties)))))
+      `(,(match-beginning 0) ,(match-end 0)
+        ,(yasnippet-capf--completion-table)
+        ,@yasnippet-capf--properties))))
 
-(provide 'cape-yasnippet)
-;;; cape-yasnippet.el ends here
+(provide 'yasnippet-capf)
+;;; yasnippet-capf.el ends here
