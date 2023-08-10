@@ -42,6 +42,7 @@
 (defvar yasnippet-capf--properties
   (list :annotation-function (lambda (snippet) (get-text-property 0 'yas-annotation snippet))
         :company-kind (lambda (_) 'snippet)
+        :company-doc-buffer #'yasnippet-capf--doc-buffer
         :exit-function (lambda (cand status)
                          (when (string= "finished" status)
                            (when-let ((snippet (yasnippet-capf--lookup-snippet cand)))
@@ -49,6 +50,27 @@
                              (yas-expand-snippet snippet))))
         :exclusive 'no)
   "Completion extra properties for `yasnippet-capf'.")
+
+(defun yasnippet-capf--doc-buffer (cand)
+  "Calculate the expansion of the snippet for CAND.
+Returns a buffer to be displayed by popupinfo."
+  (when-let ((mode major-mode)
+             (template (get-text-property 0 'yas-template cand)))
+    (with-current-buffer (get-buffer-create "*yasnippet-capf-doc*")
+      (erase-buffer)
+      (yas-minor-mode)
+      (insert "Expands to:" ?\n ?\n)
+      (condition-case error
+          (yas-expand-snippet (yas--template-content template))
+        (error
+         (message "Error expanding: %s" (error-message-string error))))
+      (delay-mode-hooks
+        (let ((inhibit-message t))
+          (when (eq mode 'web-mode)
+            (setq mode 'html-mode))
+          (funcall mode)))
+      (ignore-errors (font-lock-ensure))
+      (current-buffer))))
 
 (defun yasnippet-capf--lookup-snippet (name)
   "Get the snippet called NAME in MODE's tables."
