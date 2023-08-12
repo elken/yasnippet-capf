@@ -43,11 +43,9 @@
   (list :annotation-function (lambda (snippet) (get-text-property 0 'yas-annotation snippet))
         :company-kind (lambda (_) 'snippet)
         :company-doc-buffer #'yasnippet-capf--doc-buffer
-        :exit-function (lambda (cand status)
+        :exit-function (lambda (_ status)
                          (when (string= "finished" status)
-                           (when-let ((snippet (yasnippet-capf--lookup-snippet cand)))
-                             (delete-char (* -1 (length cand)))
-                             (yas-expand-snippet snippet))))
+                           (yas-expand)))
         :exclusive 'no)
   "Completion extra properties for `yasnippet-capf'.")
 
