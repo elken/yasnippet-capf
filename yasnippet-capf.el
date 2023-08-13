@@ -1,6 +1,7 @@
 ;;; yasnippet-capf.el --- Yasnippet Completion At Point Function -*- lexical-binding: t; -*-
 ;;
 ;; Copyright (C) 2022 Ellis Kenyő
+;; SPDX-License-Identifier: GPL-3.0-or-later
 ;;
 ;; Author: Ellis Kenyő <me@elken.dev>
 ;; Maintainer: Ellis Kenyő <me@elken.dev>
