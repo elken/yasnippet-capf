@@ -38,12 +38,19 @@
   "The method in which to lookup candidates by."
   :type '(choice
           (const :tag "Key" key)
-          (const :tag "Name" name)))
+          (const :tag "Name" name))
+  :group 'yasnippet-capf)
+
+(defcustom yasnippet-capf-annotation-prefix "  "
+  "The prefix to use for the annotation."
+  :type 'string
+  :group 'yasnippet-capf)
 
 (defvar yasnippet-capf--properties
   (list :annotation-function (lambda (snippet)
-                               (concat " " (get-text-property 0 'yas-annotation
-                                                              snippet)))
+                               (concat yasnippet-capf-annotation-prefix
+                                       (get-text-property 0 'yas-annotation
+                                                          snippet)))
         :company-kind (lambda (_) 'snippet)
         :company-doc-buffer #'yasnippet-capf--doc-buffer
         :exit-function (lambda (_ status)
