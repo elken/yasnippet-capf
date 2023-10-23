@@ -119,7 +119,7 @@ If INTERACTIVE is nil the function acts like a Capf."
   (if interactive
       (let ((completion-at-point-functions #'yasnippet-capf))
         (or (completion-at-point) (user-error "yasnippet-capf: No completions")))
-    (let ((bounds (or (bounds-of-thing-at-point 'symbol)
+    (when-let ((bounds (or (bounds-of-thing-at-point 'word)
                       (cons (point) (point)))))
       `(,(car bounds) ,(cdr bounds)
         ,(completion-table-with-cache
