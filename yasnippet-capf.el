@@ -38,7 +38,8 @@
   "The method in which to lookup candidates by."
   :type '(choice
           (const :tag "Key" key)
-          (const :tag "Name" name)))
+          (const :tag "Name" name))
+  :group 'yasnippet-capf)
 
 (defvar yasnippet-capf--properties
   (list :annotation-function (lambda (snippet) (format "  %s" (get-text-property 0 'yas-annotation snippet)))
