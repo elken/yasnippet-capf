@@ -41,7 +41,7 @@
           (const :tag "Name" name)))
 
 (defvar yasnippet-capf--properties
-  (list :annotation-function (lambda (snippet) (get-text-property 0 'yas-annotation snippet))
+  (list :annotation-function (lambda (snippet) (format "  %s" (get-text-property 0 'yas-annotation snippet)))
         :company-kind (lambda (_) 'snippet)
         :company-doc-buffer #'yasnippet-capf--doc-buffer
         :exit-function (lambda (_ status)
