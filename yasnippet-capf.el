@@ -121,8 +121,9 @@ If INTERACTIVE is nil the function acts like a Capf."
   (if interactive
       (let ((completion-at-point-functions #'yasnippet-capf))
         (or (completion-at-point) (user-error "yasnippet-capf: No completions")))
-    (when (thing-at-point-looking-at "\\(?:\\sw\\|\\s_\\)+")
-      `(,(match-beginning 0) ,(match-end 0)
+    (when-let ((bounds (or (bounds-of-thing-at-point 'word)
+                      (cons (point) (point)))))
+      `(,(car bounds) ,(cdr bounds)
         ,(completion-table-with-cache
           (lambda (input)
             (yasnippet-capf-candidates input)))
