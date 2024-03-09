@@ -58,6 +58,7 @@ Returns a buffer to be displayed by popupinfo."
              (template (get-text-property 0 'yas-template cand)))
     (with-current-buffer (get-buffer-create "*yasnippet-capf-doc*")
       (erase-buffer)
+      (remove-overlays)
       (yas-minor-mode)
       (insert "Expands to:" ?\n ?\n)
       (condition-case error
