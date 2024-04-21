@@ -5,8 +5,8 @@ A simple [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-
 * Install
 ** Manual
 Download somewhere and add to your =load-path= and add =yasnippet-capf= to =completion-at-point-functions=.
-** TODO Doom
-Add the following lines to your relevant files
+** use-package
+For Doom specifically use the following and use =use-package!= instead.
 
 =packages.el=
 #+begin_src emacs-lisp
@@ -14,16 +14,31 @@ Add the following lines to your relevant files
   :recipe (:host github :repo "elken/yasnippet-capf"))
 #+end_src
 
-=config.el=
+Use the below recipe for =use-package= managers
+
 #+begin_src emacs-lisp
-(use-package! yasnippet-capf
+(use-package yasnippet-capf
   :after cape
   :config
   (add-to-list 'completion-at-point-functions #'yasnippet-capf))
 #+end_src
 
+If you're struggling to get completions using this approach, or you only want them available in certain modes, you might have
+better luck instead registering a hook.
+
+#+begin_src emacs-lisp
+(use-package yasnippet-capf
+  :after cape
+  :init
+  (defun my/yasnippet-capf-h ()
+    (add-to-list 'completion-at-point-function #'yasnippet-capf))
+  :hook
+  (emacs-lisp-mode . my/yasnippet-capf-h))
+#+end_src
+
 * Configuration
 The following options are available to customise:
+
 ** =yasnippet-capf-lookup-by=
 Which lookup method to use to query snippets. By default, this uses the key to query against but if preferred you can also set this to use the name of the snippet.
 
