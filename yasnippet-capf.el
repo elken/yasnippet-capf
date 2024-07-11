@@ -47,9 +47,14 @@
                                                    (substring-no-properties snippet))))
         :company-kind (lambda (_) 'snippet)
         :company-doc-buffer #'yasnippet-capf--doc-buffer
-        :exit-function (lambda (_ status)
+        :exit-function (lambda (snippet status)
                          (when (string= "finished" status)
-                           (yas-expand)))
+                           (if (eq yasnippet-capf-lookup-by 'name)
+                             (yas-expand-snippet
+                               (yas-lookup-snippet snippet)
+                               (- (point) (length snippet))
+                               (point))
+                             (yas-expand))))
         :exclusive 'no)
   "Completion extra properties for `yasnippet-capf'.")
 
