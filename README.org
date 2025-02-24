@@ -31,7 +31,7 @@ better luck instead registering a hook.
   :after cape
   :init
   (defun my/yasnippet-capf-h ()
-    (add-to-list 'completion-at-point-function #'yasnippet-capf))
+    (add-to-list 'completion-at-point-functions #'yasnippet-capf))
   :hook
   (emacs-lisp-mode . my/yasnippet-capf-h))
 #+end_src
