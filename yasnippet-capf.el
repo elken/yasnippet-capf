@@ -41,6 +41,13 @@
           (const :tag "Name" name))
   :group 'yasnippet-capf)
 
+(defcustom yasnippet-capf-max-search-distance nil
+  "Maximum distance to search for a snippet around point.
+
+Nil means unlimited distance."
+  :type 'integer
+  :group 'yasnippet-capf)
+
 (defvar yasnippet-capf--properties
   (list :annotation-function (lambda (snippet)
                                (format "  %s " (or (get-text-property 0 'yas-annotation snippet)
@@ -128,7 +135,7 @@ If INTERACTIVE is nil the function acts like a Capf."
   (if interactive
       (let ((completion-at-point-functions #'yasnippet-capf))
         (or (completion-at-point) (user-error "yasnippet-capf: No completions")))
-    (when (thing-at-point-looking-at "\\(?:\\sw\\|\\s_\\)+")
+    (when (thing-at-point-looking-at "\\(?:\\sw\\|\\s_\\)+" yasnippet-capf-max-search-distance)
       `(,(match-beginning 0) ,(match-end 0)
         ,(completion-table-with-cache
           (lambda (input)
